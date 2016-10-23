@@ -1,0 +1,30 @@
+ &control
+    calculation='scf'
+    restart_mode='from_scratch',
+    prefix='nb',
+    pseudo_dir = '~/PWSCF/pseudo',
+    outdir='./work'
+	disk_io='low'
+ /
+ &system
+    ibrav=  3, celldm(1) = 6.246, nat=  1, ntyp= 1,
+    ecutwfc = 30.0, 
+	ecutrho = 300,
+    occupations='smearing',
+    smearing='methfessel-paxton',
+    degauss=0.025,
+ /
+ &electrons
+    conv_thr =  1.0d-10
+    mixing_beta = 0.7
+ /
+ &ions
+ /
+ &cell
+ /
+ATOMIC_SPECIES
+ Nb   92.90638   Nb.pbe-nsp-van.UPF
+ATOMIC_POSITIONS
+ Nb 0.00 0.00 0.00 
+K_POINTS {automatic}
+ 16 16 16  0 0 0

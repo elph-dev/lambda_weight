@@ -1,0 +1,14 @@
+Electron-phonon coefficients
+ &inputph
+  tr2_ph=1.0d-16,
+  prefix='nb',
+  fildvscf='nbdv',
+  fildyn='nb.dyn',
+  outdir='./work'
+  reduce_io=.true.
+  electron_phonon='simple'
+  trans=.true.,
+  ldisp=.true.
+  el_ph_sigma = 0.005d0
+  nq1=8, nq2=8, nq3=8
+ /

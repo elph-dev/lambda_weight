@@ -1,0 +1,16 @@
+This example tests lambda_weight.x in Nb case.
+
+1) calculate density of states using tetrahedron method
+   pw.x < scf_dos.in > scf_dos.out
+   dos.x < dos.in > dos.out
+
+2) calculate electron-phonon couplings using 8x8x8 k and q-mesh
+   pw.x < scf.in > scf.out
+   pw.x < nscf.in > nscf.out
+   ph.x < elph.in > elph.out
+
+3) calculate lambda and omega_log using smearing method
+   lambda_weight.x < lambda.in > lambda.out
+
+4) calculate lambda and omega_log using weighted average method
+   lambda_weight.x < lambda_weight.in > lambda_weight.out

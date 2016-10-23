@@ -1,0 +1,6 @@
+&dos
+  prefix = 'nb'
+  outdir = './work'
+  Emin = 17.9095
+  Emax = 17.9095
+/
