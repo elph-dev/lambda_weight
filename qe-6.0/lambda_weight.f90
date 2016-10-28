@@ -12,7 +12,7 @@ PROGRAM lambda_weight
   ! sum over q-points to produce the electron-phonon coefficients:
   ! lambda using weighted-average method
   ! T_c using Allen-Dynes formula
-  ! see T.Koretsune et al. ??
+  ! see T.Koretsune and R.Arita in preparation.
   !
   ! INPUT from standard input:
   ! &input

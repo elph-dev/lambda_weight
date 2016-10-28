@@ -1,4 +1,4 @@
-Weighted average method for calculating electron-phonon couplings
+Weighted average method for lambda
 ========
 lambda_weight is a program to calculate electron-phonon couplings using weighted average method.
 For details, see
@@ -13,6 +13,8 @@ Currently, the program is based on the quantum-ESPRESSO v6.0.
 
 	2. Apply a patch to the qe-6.0/PHonon/PH directory.
 		> cd PATH/TO/QEDIR/qe-6.0/PHonon
+		> cp -a PH PHelph
+		> cd PHelph
 		> patch -p1 < LAMBDA_WEIGHT_DIR/qe-6.0/lambda_weight.patch
 
 	3. Compile
@@ -20,5 +22,5 @@ Currently, the program is based on the quantum-ESPRESSO v6.0.
 		> make ( lambda_weight.x )
 
 # Usage
-	You can find an example in qe-6.0/examples/Nb.
+	You can find an example in qe-6.0/examples/Nb. See README in this directory for more details.
 

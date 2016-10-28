@@ -103,7 +103,7 @@ diff -uprN PH/lambda.f90 PHelph/lambda.f90
              'N(Ef)=',f9.6,' at degauss=',f5.3)
 diff -uprN PH/lambda_weight.f90 PHelph/lambda_weight.f90
 --- PH/lambda_weight.f90	1970-01-01 09:00:00.000000000 +0900
-+++ PHelph/lambda_weight.f90	2016-10-24 06:27:27.175974711 +0900
++++ PHelph/lambda_weight.f90	2016-10-29 07:22:40.005908013 +0900
 @@ -0,0 +1,294 @@
 +!
 +! Copyright (C) 2002-2010 Quantum ESPRESSO group
@@ -119,7 +119,7 @@ diff -uprN PH/lambda_weight.f90 PHelph/lambda_weight.f90
 +  ! sum over q-points to produce the electron-phonon coefficients:
 +  ! lambda using weighted-average method
 +  ! T_c using Allen-Dynes formula
-+  ! see T.Koretsune et al. ??
++  ! see T.Koretsune and R.Arita in preparation.
 +  !
 +  ! INPUT from standard input:
 +  ! &input
