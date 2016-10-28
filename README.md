@@ -20,5 +20,5 @@ Currently, the program is based on the quantum-ESPRESSO v6.0.
 		> make ( lambda_weight.x )
 
 # Usage
-	You can find an example in lambda_weight/qe-6.0/examples/Nb.
+	You can find an example in qe-6.0/examples/Nb.
 
