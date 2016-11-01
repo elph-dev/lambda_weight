@@ -3,7 +3,7 @@ Weighted average method for lambda
 lambda_weight is a program to calculate electron-phonon couplings using weighted average method.
 For details, see
 
-  T. Koretsune and R. Arita  in preparation.
+  T. Koretsune and R. Arita  [arxiv:1610.09441](http://arxiv.org/abs/1610.09441)
 
 Currently, the program is based on the quantum-ESPRESSO v6.0.
 
