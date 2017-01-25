@@ -12,7 +12,7 @@ PROGRAM lambda_weight
   ! sum over q-points to produce the electron-phonon coefficients:
   ! lambda using weighted-average method
   ! T_c using Allen-Dynes formula
-  ! see T.Koretsune and R.Arita in preparation.
+  ! see T.Koretsune and R.Arita, arXiv:1610.09441
   !
   ! INPUT from standard input:
   ! &input
@@ -59,6 +59,7 @@ PROGRAM lambda_weight
   REAL(DP), ALLOCATABLE:: w2(:), omega(:,:), omega_matdyn(:,:), omegalog(:)
   REAL(DP), ALLOCATABLE:: degauss(:), phase_space_sum(:)
   REAL(DP), ALLOCATABLE:: lambda(:), lambdaq(:,:,:), dosef(:), ef(:), alpha2F(:,:)
+  REAL(DP), ALLOCATABLE:: sum_alpha2F(:)
   CHARACTER(LEN=256) :: filelph, filelph_n, flfrq, fmt_str, flambda
   !
   INTEGER, EXTERNAL :: find_free_unit
@@ -174,7 +175,15 @@ PROGRAM lambda_weight
         READ(iuelph,'(25x,f20.10)') phase_space
         phase_space_sum(ng) = phase_space_sum(ng) + phase_space * wq(iq)
         DO mu=1, nmodes
-           READ(iuelph,'(12x,i5,2x,f15.8,9x,f12.4)') nu, lambdaq(mu,ng,iq), gammaq
+           READ(iuelph,'(12x,i5,2x,f15.8,9x,f12.4)', iostat=ios) nu, lambdaq(mu,ng,iq), gammaq
+           if(ios > 0) then
+             if(iq == 1) then
+               write(6,*) 'read lambda at q=0 mode : failed'
+             else
+               write(6,*) 'read lambda : failed'
+               stop
+             end if
+           end if
            ! rescaling using matdyn phonon frequency (if needed)
            !IF(omega(nu,iq) > eps) &
               !lambdaq(mu,ng,iq) = lambdaq(mu,ng,iq) * w2(nu) / (omega(nu,iq)/ry_to_cmm1)**2
@@ -187,7 +196,7 @@ PROGRAM lambda_weight
         ELSE
            IF(degauss(ng) /= degauss1 .or. ngauss /= ngauss1) &
               CALL errore('lambda_weight', 'inconsistent gaussian broadening', iq)
-           IF(abs(dosef(ng) - dosef1) > 1d-3 .or. abs(ef(ng) - ef1) > 1d-3) &
+           IF(abs(dosef(ng) - dosef1) > 1d-1 .or. abs(ef(ng) - ef1) > 1d-1) &
               CALL errore('lambda_weight', 'inconsistent DOS(EF) or EF', iq)
         END IF
      END DO ! ng
@@ -211,9 +220,9 @@ PROGRAM lambda_weight
   !
   de_a2F = degauss_a2F/10
   IF(emax_a2F < 0) emax_a2F = maxval(omega(1:nmodes,1:nq))
-  nemax_a2F = int(emax_a2F/de_a2F)
+  nemax_a2F = int(emax_a2F/de_a2F+20)
   !
-  ALLOCATE(lambda(nsig), omegalog(nsig), alpha2F(nemax_a2F, nsig))
+  ALLOCATE(lambda(nsig), omegalog(nsig), alpha2F(nemax_a2F, nsig), sum_alpha2F(nsig))
   lambda = 0
   omegalog = 0
   alpha2F = 0
@@ -225,13 +234,13 @@ PROGRAM lambda_weight
            IF(omega(mu,iq) > eps) THEN
               lambda(ng) = lambda(ng) + wq(iq) * lambdaq(mu,ng,iq)
               omegalog(ng) = omegalog(ng) + wq(iq) * lambdaq(mu,ng,iq) * log(omega(mu,iq))
+              DO i=1,nemax_a2F
+                 e = (i-1)*de_a2F
+                 alpha2F(i,ng) = alpha2F(i,ng) + &
+                      wq(iq) * lambdaq(mu,ng,iq) * omega(mu,iq) * 0.5d0 * &
+                      w0gauss((e-omega(mu,iq))/degauss_a2F,ngauss_a2F)/degauss_a2F
+              END DO
            END IF
-           DO i=1,nemax_a2F
-              e = (i-1)*de_a2F
-              alpha2F(i,ng) = alpha2F(i,ng) + &
-                   wq(iq) * lambdaq(mu,ng,iq) * omega(mu,iq) * 0.5d0 * &
-                   w0gauss((e-omega(mu,iq))/degauss_a2F,ngauss_a2F)/degauss_a2F
-           END DO
         END DO
      END DO ! iq
      omegalog(ng) = exp(omegalog(ng)/lambda(ng))*cmm1_to_kelvin
@@ -265,7 +274,7 @@ PROGRAM lambda_weight
         lambda(ng), omegalog(ng), Ad_Tc(lambda(ng), omegalog(ng), mustar)
   END DO
   !
-  ! output alpha2F_weight.dat
+  ! output alpha2F.dat
   !
   OPEN(UNIT=iuelph,FILE='alpha2F.dat',STATUS='unknown')
   WRITE(fmt_str, '(i3,"f10.5")') nsig
@@ -274,6 +283,20 @@ PROGRAM lambda_weight
   DO i=1,nemax_a2F
      e=(i-1)*de_a2F
      WRITE(iuelph,'(f16.6,' // TRIM(fmt_str) // ')') e,(alpha2F(i,ng),ng=1,nsig)
+  END DO
+  CLOSE(UNIT=iuelph)
+  !
+  ! output sum_alpha2F.dat
+  !
+  OPEN(UNIT=iuelph,FILE='sum_alpha2F.dat',STATUS='unknown')
+  WRITE(fmt_str, '(i3,"f10.5")') nsig
+  WRITE(iuelph, '("# degauss(Ry):",' // TRIM(fmt_str) // ')') (degauss(ng),ng=1,nsig)
+  WRITE(iuelph, '("# energy (cm-1),  sum a2F(ng), ng = 1,", i5)') nsig
+  sum_alpha2F(1:nsig) = 0
+  DO i=2,nemax_a2F
+     e=(i-1)*de_a2F
+     sum_alpha2F(1:nsig) = sum_alpha2F(1:nsig) + alpha2F(i,1:nsig)/e * 2 * de_a2F
+     WRITE(iuelph,'(f16.6,' // TRIM(fmt_str) // ')') e,(sum_alpha2F(ng),ng=1,nsig)
   END DO
   CLOSE(UNIT=iuelph)
   !
